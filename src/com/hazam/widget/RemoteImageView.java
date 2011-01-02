@@ -12,6 +12,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -79,12 +80,13 @@ public class RemoteImageView extends ImageView {
 		protected Uri doInBackground(Void...params) {
 			BetterHttpClient client = new BetterHttpClient(null, false);
 			HttpGet getFile = new HttpGet(target.toString());
+			String encoded = Base64.encodeToString(target.getLastPathSegment().getBytes(), Base64.DEFAULT);
 			try {
 				HttpResponse resp = client.execute(getFile);
 				HttpEntity ent = resp.getEntity();
 				long length = ent.getContentLength();
 				InputStream in = ent.getContent();
-				FileOutputStream f = new FileOutputStream(new File("/sdcard/" + target.getLastPathSegment()));
+				FileOutputStream f = new FileOutputStream(new File("/sdcard/" + encoded));
 				byte[] buffer = new byte[1024];
 				int len1 = 0;
 				long cumul = 0;
@@ -98,7 +100,7 @@ public class RemoteImageView extends ImageView {
 				e.printStackTrace();
 			}
 
-			return Uri.parse("/sdcard/" + target.getLastPathSegment());
+			return Uri.parse("/sdcard/" + encoded);
 		}
 
 		@Override
