@@ -1,6 +1,7 @@
 package com.hazam.romaski;
 
 import android.app.TabActivity;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -34,15 +35,14 @@ public class RomaTabsActivity extends TabActivity implements TabContentFactory {
 		Resort selReport = Resort.ALL.get(tag);
 		final LinearLayout anf = new LinearLayout(this);
 		anf.setOrientation(LinearLayout.VERTICAL);
-		anf.setLayoutParams( new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT) );
+		LayoutParams wrap_wrap = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
+		anf.setLayoutParams( wrap_wrap );
 		for (Uri s : selReport) {
-			/*WebView wv = new WebView(this);
-			wv.loadUrl(s.toString());*/
 			RemoteImageView wv = new RemoteImageView(this);
-			wv.setLayoutParams( new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+			wv.setLayoutParams( wrap_wrap);
 			wv.setImageURI(s);
-			wv.setScaleType(ScaleType.CENTER_INSIDE);
-			anf.addView(wv);
+			wv.setAdjustViewBounds(true);
+			anf.addView(wv, wrap_wrap);
 		}
 		sv.addView(anf);
 		return sv;

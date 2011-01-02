@@ -26,6 +26,7 @@ import com.hazam.handy.net.BetterHttpClient;
 public class RemoteImageView extends ImageView {
 	
 	private static final String TAG = "RemoteImageView";
+	private Uri remoteUri = null;
 	
 	public RemoteImageView(Context context) {
 		super(context);
@@ -46,10 +47,15 @@ public class RemoteImageView extends ImageView {
 	@Override
 	public void setImageURI(Uri uri) {
 		if (uri.toString().startsWith("http")) {
-			new DownloaderTask(uri).execute();
+			remoteUri = uri;
+			reload();
 		} else {
 			super.setImageURI(uri);
 		}
+	}
+	
+	public void reload() {
+		new DownloaderTask(remoteUri).execute();
 	}
 
 	public class DownloaderTask extends AsyncTask<Void, Long, Uri> {
