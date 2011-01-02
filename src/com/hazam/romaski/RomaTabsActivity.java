@@ -12,6 +12,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 
 import com.hazam.romaski.model.Resort;
+import com.hazam.widget.RemoteImageView;
 
 public class RomaTabsActivity extends TabActivity implements TabContentFactory {
 
@@ -21,7 +22,7 @@ public class RomaTabsActivity extends TabActivity implements TabContentFactory {
 
 		TabHost tabHost = getTabHost();
 		for (Resort r : Resort.ALL.values()) {
-			tabHost.addTab(tabHost.newTabSpec(r.getId()).setIndicator(r.getName()).setContent(this));
+			tabHost.addTab(tabHost.newTabSpec(r.getId()).setIndicator(null, getResources().getDrawable(r.getDrawableId())).setContent(this));
 		}
 	}
 
@@ -34,9 +35,11 @@ public class RomaTabsActivity extends TabActivity implements TabContentFactory {
 		anf.setOrientation(LinearLayout.VERTICAL);
 		anf.setLayoutParams( new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) );
 		for (Uri s : selReport) {
-			WebView wv = new WebView(this);
+			/*WebView wv = new WebView(this);
+			wv.loadUrl(s.toString());*/
+			RemoteImageView wv = new RemoteImageView(this);
 			wv.setLayoutParams( new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-			wv.loadUrl(s.toString());
+			wv.setImageURI(s);
 			anf.addView(wv);
 		}
 		sv.addView(anf);
