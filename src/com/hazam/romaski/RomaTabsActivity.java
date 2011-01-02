@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TabHost;
@@ -33,13 +34,14 @@ public class RomaTabsActivity extends TabActivity implements TabContentFactory {
 		Resort selReport = Resort.ALL.get(tag);
 		final LinearLayout anf = new LinearLayout(this);
 		anf.setOrientation(LinearLayout.VERTICAL);
-		anf.setLayoutParams( new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) );
+		anf.setLayoutParams( new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT) );
 		for (Uri s : selReport) {
 			/*WebView wv = new WebView(this);
 			wv.loadUrl(s.toString());*/
 			RemoteImageView wv = new RemoteImageView(this);
-			wv.setLayoutParams( new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			wv.setLayoutParams( new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 			wv.setImageURI(s);
+			wv.setScaleType(ScaleType.CENTER_INSIDE);
 			anf.addView(wv);
 		}
 		sv.addView(anf);
