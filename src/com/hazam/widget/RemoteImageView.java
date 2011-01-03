@@ -3,10 +3,14 @@ package com.hazam.widget;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.cookie.DateUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,7 +30,6 @@ import com.hazam.handy.net.BetterHttpClient;
  * Extended ImageView to handle http:// loading of the images. Includes caching on SDCARD (if available)
  * 
  * @author Emanuele Di Saverio
- * 
  */
 public class RemoteImageView extends ImageView {
 
@@ -92,26 +95,33 @@ public class RemoteImageView extends ImageView {
 			if (ni != null && ni.isConnected()) {
 				BetterHttpClient client = new BetterHttpClient(null, false);
 				HttpGet getFile = new HttpGet(target.toString());
+				if (targetFile.exists()) {
+					String lastModifiedFormatted = DateUtils.formatDate(new Date(targetFile.lastModified()));
+					getFile.addHeader("If-Modified-Since", lastModifiedFormatted);
+				}
 				try {
 					HttpResponse resp = client.execute(getFile);
 					HttpEntity ent = resp.getEntity();
-					final long length = ent.getContentLength();
-					InputStream in = ent.getContent();
-					FileOutputStream f = new FileOutputStream(targetFile);
-					StreamUtils.decantStreams(in, f, new StreamUtils.Tick() {
-						
-						@Override
-						public void tick(long current) {
-							publishProgress(current, length);
-						}
-					});
-					f.close();
+					if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+						final long length = ent.getContentLength();
+						InputStream in = ent.getContent();
+						FileOutputStream f = new FileOutputStream(targetFile);
+						StreamUtils.decantStreams(in, f, new StreamUtils.Tick() {
+
+							@Override
+							public void tick(long current) {
+								publishProgress(current, length);
+							}
+						});
+						f.close();
+					}
+					ent.consumeContent();
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
 			}
 			if (targetFile.exists()) {
-				return Uri.parse("file://"+targetFile.getAbsolutePath());
+				return Uri.parse("file://" + targetFile.getAbsolutePath());
 			} else {
 				return null;
 			}
