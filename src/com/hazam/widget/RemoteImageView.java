@@ -8,7 +8,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
+import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
@@ -16,6 +19,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.hazam.handy.fs.StreamUtils;
 import com.hazam.handy.net.BetterHttpClient;
 
 /**
@@ -25,10 +29,10 @@ import com.hazam.handy.net.BetterHttpClient;
  * 
  */
 public class RemoteImageView extends ImageView {
-	
+
 	private static final String TAG = "RemoteImageView";
 	private Uri remoteUri = null;
-	
+
 	public RemoteImageView(Context context) {
 		super(context);
 	}
@@ -44,7 +48,7 @@ public class RemoteImageView extends ImageView {
 	private static void trace(String msg) {
 		Log.v(TAG, msg);
 	}
-	
+
 	@Override
 	public void setImageURI(Uri uri) {
 		if (uri.toString().startsWith("http")) {
@@ -54,7 +58,7 @@ public class RemoteImageView extends ImageView {
 			super.setImageURI(uri);
 		}
 	}
-	
+
 	public void reload() {
 		new DownloaderTask(remoteUri).execute();
 	}
@@ -73,39 +77,49 @@ public class RemoteImageView extends ImageView {
 
 		@Override
 		protected void onPostExecute(Uri result) {
-			setImageURI(result);
+			if (result != null) {
+				setImageURI(result);
+			}
 		}
 
 		@Override
-		protected Uri doInBackground(Void...params) {
-			BetterHttpClient client = new BetterHttpClient(null, false);
-			HttpGet getFile = new HttpGet(target.toString());
+		protected Uri doInBackground(Void... params) {
 			String encoded = Base64.encodeToString(target.getLastPathSegment().getBytes(), Base64.DEFAULT);
-			try {
-				HttpResponse resp = client.execute(getFile);
-				HttpEntity ent = resp.getEntity();
-				long length = ent.getContentLength();
-				InputStream in = ent.getContent();
-				FileOutputStream f = new FileOutputStream(new File("/sdcard/" + encoded));
-				byte[] buffer = new byte[1024];
-				int len1 = 0;
-				long cumul = 0;
-				while ((len1 = in.read(buffer)) > 0) {
-					f.write(buffer, 0, len1);
-					cumul += len1;
-					publishProgress(cumul, length);
+			encoded = target.getLastPathSegment();
+			File targetFile = new File(getContext().getCacheDir() + "/" + encoded);
+			ConnectivityManager nm = (ConnectivityManager) getContext().getSystemService(Activity.CONNECTIVITY_SERVICE);
+			NetworkInfo ni = nm.getActiveNetworkInfo();
+			if (ni != null && ni.isConnected()) {
+				BetterHttpClient client = new BetterHttpClient(null, false);
+				HttpGet getFile = new HttpGet(target.toString());
+				try {
+					HttpResponse resp = client.execute(getFile);
+					HttpEntity ent = resp.getEntity();
+					final long length = ent.getContentLength();
+					InputStream in = ent.getContent();
+					FileOutputStream f = new FileOutputStream(targetFile);
+					StreamUtils.decantStreams(in, f, new StreamUtils.Tick() {
+						
+						@Override
+						public void tick(long current) {
+							publishProgress(current, length);
+						}
+					});
+					f.close();
+				} catch (Throwable e) {
+					e.printStackTrace();
 				}
-				f.close();
-			} catch (Throwable e) {
-				e.printStackTrace();
 			}
-
-			return Uri.parse("/sdcard/" + encoded);
+			if (targetFile.exists()) {
+				return Uri.parse("file://"+targetFile.getAbsolutePath());
+			} else {
+				return null;
+			}
 		}
 
 		@Override
 		protected void onProgressUpdate(Long... values) {
-			// here should update the progress bar of something
+			trace("Just tracing..." + values[0] + " over " + values[1]);
 		}
 	}
 }

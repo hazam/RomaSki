@@ -1,17 +1,16 @@
 package com.hazam.romaski.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.hazam.romaski.R;
 
 import android.net.Uri;
 
+import com.hazam.romaski.R;
+
 public class Resort extends ArrayList<Uri> {
-	
-	
-	public static Map<String, Resort> ALL = new HashMap<String,Resort>();
+	private static final long serialVersionUID = 6668480187615423193L;
+	public static Map<String, Resort> ALL = new LinkedHashMap<String,Resort>();
 	public static Resort CAMPO_FELICE = new Resort("cfelice");
 	public static Resort OVINDOLI = new Resort("ovindoli");
 	public static Resort GRAN_SASSO = new Resort("gransasso");
