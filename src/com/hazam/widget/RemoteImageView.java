@@ -18,7 +18,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -86,8 +85,7 @@ public class RemoteImageView extends ImageView {
 
 		@Override
 		protected Uri doInBackground(Void... params) {
-			String encoded = Base64.encodeToString(target.getLastPathSegment().getBytes(), Base64.DEFAULT);
-			encoded = target.getLastPathSegment();
+			String encoded = target.getLastPathSegment();
 			File targetFile = new File(getContext().getCacheDir() + "/" + encoded);
 			ConnectivityManager nm = (ConnectivityManager) getContext().getSystemService(Activity.CONNECTIVITY_SERVICE);
 			NetworkInfo ni = nm.getActiveNetworkInfo();
@@ -120,7 +118,7 @@ public class RemoteImageView extends ImageView {
 				}
 			}
 			if (targetFile.exists()) {
-				return Uri.parse("file://" + targetFile.getAbsolutePath());
+				return Uri.parse(targetFile.getAbsolutePath());
 			} else {
 				return null;
 			}

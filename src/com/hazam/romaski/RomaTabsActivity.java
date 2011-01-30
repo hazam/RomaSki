@@ -3,6 +3,7 @@ package com.hazam.romaski;
 import android.app.TabActivity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
@@ -32,14 +33,17 @@ public class RomaTabsActivity extends TabActivity implements TabContentFactory {
 		Resort selReport = Resort.ALL.get(tag);
 		final LinearLayout anf = new LinearLayout(this);
 		anf.setOrientation(LinearLayout.VERTICAL);
-		LayoutParams wrap_wrap = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
+		LayoutParams wrap_wrap = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT); 
 		anf.setLayoutParams( wrap_wrap );
+		anf.setGravity(Gravity.CENTER_HORIZONTAL);
 		for (Uri s : selReport) {
 			RemoteImageView wv = new RemoteImageView(this);
 			wv.setLayoutParams( wrap_wrap);
 			wv.setImageURI(s);
-			wv.setAdjustViewBounds(true);
-			anf.addView(wv, wrap_wrap);
+			//wv.setAdjustViewBounds(true);
+			anf.addView(wv, new LayoutParams(
+					(int) (280 * getResources().getDisplayMetrics().density),
+					(int) (280 * getResources().getDisplayMetrics().density)));
 		}
 		sv.addView(anf);
 		return sv;
