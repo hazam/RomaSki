@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item>
+		<bitmap android:src="@drawable/banner" />
+	</item>
+	<item>
+		<shape android:shape="rectangle">
+			<gradient android:centerY="0.1"
+				 android:startColor="#99000000" android:centerColor="#00000000"
+				android:angle="270" />
+		</shape>
+	</item>
+	<item>
+		<shape 
+			android:shape="rectangle">
+			<gradient android:centerY="0.9" 
+				android:centerColor="#00000000" android:endColor="#99000000"
+				android:angle="270" />
+		</shape>
+	</item>
+</layer-list>

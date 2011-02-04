@@ -4,12 +4,14 @@
 	android:versionName="1.1">
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:theme="@style/Theme.RomaSki">
-		<activity android:name=".RomaTabsActivity" android:label="@string/app_name">
+		<activity android:name=".RomaTabsActivity" 
+		android:screenOrientation="portrait" android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity android:name="ResortInfoActivity" />
 	</application>
 	<uses-sdk android:minSdkVersion="4" android:targetSdkVersion="7"/>
 	<uses-permission android:name="android.permission.INTERNET" />

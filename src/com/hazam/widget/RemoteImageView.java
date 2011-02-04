@@ -23,13 +23,15 @@ import android.widget.ImageView;
 
 import com.hazam.handy.fs.FileUtils;
 import com.hazam.handy.net.BetterHttpClient;
+import com.hazam.romaski.R;
+import com.hazam.widget.DownloadTask.DownloadListener;
 
 /**
  * Extended ImageView to handle http:// loading of the images. Includes caching on SDCARD (if available)
  * 
  * @author Emanuele Di Saverio
  */
-public class RemoteImageView extends ImageView {
+public class RemoteImageView extends ImageView implements DownloadListener {
 
 	private static final String TAG = "RemoteImageView";
 	private Uri remoteUri = null;
@@ -54,6 +56,7 @@ public class RemoteImageView extends ImageView {
 	public void setImageURI(Uri uri) {
 		if (uri.toString().startsWith("http")) {
 			remoteUri = uri;
+			super.setImageResource(R.drawable.hourglass);
 			reload();
 		} else {
 			super.setImageURI(uri);
@@ -61,72 +64,19 @@ public class RemoteImageView extends ImageView {
 	}
 
 	public void reload() {
-		new DownloaderTask(remoteUri).execute();
+		DownloadTask task = new DownloadTask(getContext(), remoteUri);
+		task.setListener(this);
+		task.execute();
 	}
 
-	public class DownloaderTask extends AsyncTask<Void, Long, Uri> {
+	@Override
+	public void onResourceUpdate(Uri uri) {
+		super.setImageURI(uri);
+	}
 
-		private final Uri target;
-
-		public DownloaderTask(Uri _target) {
-			target = _target;
-		}
-
-		@Override
-		protected void onPreExecute() {
-		}
-
-		@Override
-		protected void onPostExecute(Uri result) {
-			if (result != null) {
-				setImageURI(result);
-			}
-		}
-
-		@Override
-		protected Uri doInBackground(Void... params) {
-			String encoded = target.getLastPathSegment();
-			File targetFile = new File(getContext().getCacheDir() + "/" + encoded);
-			ConnectivityManager nm = (ConnectivityManager) getContext().getSystemService(Activity.CONNECTIVITY_SERVICE);
-			NetworkInfo ni = nm.getActiveNetworkInfo();
-			if (ni != null && ni.isConnected()) {
-				BetterHttpClient client = new BetterHttpClient(null, false);
-				HttpGet getFile = new HttpGet(target.toString());
-				if (targetFile.exists()) {
-					String lastModifiedFormatted = DateUtils.formatDate(new Date(targetFile.lastModified()));
-					getFile.addHeader("If-Modified-Since", lastModifiedFormatted);
-				}
-				try {
-					HttpResponse resp = client.execute(getFile);
-					HttpEntity ent = resp.getEntity();
-					if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-						final long length = ent.getContentLength();
-						InputStream in = ent.getContent();
-						FileOutputStream f = new FileOutputStream(targetFile);
-						FileUtils.decantStreams(in, f, new FileUtils.Tick() {
-
-							@Override
-							public void tick(long current) {
-								publishProgress(current, length);
-							}
-						});
-						f.close();
-					}
-					ent.consumeContent();
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
-			}
-			if (targetFile.exists()) {
-				return Uri.parse(targetFile.getAbsolutePath());
-			} else {
-				return null;
-			}
-		}
-
-		@Override
-		protected void onProgressUpdate(Long... values) {
-			trace("Just tracing..." + values[0] + " over " + values[1]);
-		}
+	@Override
+	public void onError(Throwable e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
