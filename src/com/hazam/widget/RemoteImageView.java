@@ -21,7 +21,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.hazam.handy.fs.StreamUtils;
+import com.hazam.handy.fs.FileUtils;
 import com.hazam.handy.net.BetterHttpClient;
 
 /**
@@ -103,7 +103,7 @@ public class RemoteImageView extends ImageView {
 						final long length = ent.getContentLength();
 						InputStream in = ent.getContent();
 						FileOutputStream f = new FileOutputStream(targetFile);
-						StreamUtils.decantStreams(in, f, new StreamUtils.Tick() {
+						FileUtils.decantStreams(in, f, new FileUtils.Tick() {
 
 							@Override
 							public void tick(long current) {
