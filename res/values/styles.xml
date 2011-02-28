@@ -4,7 +4,7 @@
 		<item name="android:background">@drawable/title_bg</item>
 	</style>
 	<style name="Theme.RomaSki" parent="android:style/Theme.Light">
-		<item name="android:windowBackground">@drawable/window_bg</item>
+		<!--item name="android:windowBackground">@drawable/window_bg</item-->
 		<item name="android:windowTitleSize">46dip</item>
 		<item name="android:windowTitleBackgroundStyle">@style/CustomWindowTitleBackground</item>
 	</style>

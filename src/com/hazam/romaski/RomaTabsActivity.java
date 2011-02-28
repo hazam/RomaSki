@@ -2,6 +2,7 @@ package com.hazam.romaski;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.view.Window;
 import android.widget.TabHost;
@@ -26,5 +27,6 @@ public class RomaTabsActivity extends TabActivity {
 			tabHost.addTab(spec);
 		}
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
+		getWindow().setFormat(PixelFormat.RGBA_8888);
 	}
 }

@@ -1,10 +1,11 @@
 package com.hazam.widget;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,31 +23,40 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hazam.handy.fs.FileUtils;
+import com.hazam.handy.fs.FilesystemCache;
 import com.hazam.handy.net.BetterHttpClient;
 
 public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtils.Tick {
 
 	private final Context ctx;
-	private final File cacheDir;
 	private final ConnectivityManager connectivityManager;
-	private final BetterHttpClient httpClient;
+	private static final BetterHttpClient httpClient = BetterHttpClient.buildClient(null, false);
 
 	private long clength;
 	private Throwable error = null;
 	private Uri targetUri;
-	private File targetFile;
-	private DownloadListener listener;
+	private FilesystemCache cache;
 
-	public DownloadTask(final Context _ctx, Uri targetUri) {
+	private ArrayList<DownloadListener> listeners = new ArrayList<DownloadListener>();
+
+	private static HashMap<Uri, DownloadTask> pending = new HashMap<Uri, DownloadTask>();
+
+	public static DownloadTask retrievePending(Uri targetUri) {
+		if (pending.containsKey(targetUri)) {
+			return pending.get(targetUri);
+		}
+		return null;
+	}
+
+	public DownloadTask(final Context _ctx, Uri targetUri, FilesystemCache cache) {
 		this.ctx = _ctx.getApplicationContext();
 		this.connectivityManager = (ConnectivityManager) ctx.getSystemService(Activity.CONNECTIVITY_SERVICE);
-		this.httpClient = new BetterHttpClient(null, false);
-		this.cacheDir = new File(ctx.getCacheDir(), TAG);
 		this.targetUri = targetUri;
+		this.cache = cache;
 	}
 
 	public static interface DownloadListener {
-		
+
 		public void onResourceUpdate(Uri uri);
 
 		public void onError(Throwable e);
@@ -54,30 +64,31 @@ public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtil
 
 	@Override
 	protected void onPreExecute() {
-		String computed = targetUri.getLastPathSegment();
-		targetFile = new File(cacheDir, computed);
-		if (targetFile.exists() && listener != null) {
-			listener.onResourceUpdate(Uri.parse(targetFile.getAbsolutePath()));
-		}
+		pending.put(targetUri, this);
 	}
 
 	@Override
-	protected void onPostExecute(final Uri result) {
+	protected void onPostExecute(Uri result) {
 		if (error != null) {
 			// exception
-			if (listener != null) {
-				listener.onError(error);
-			}
-		} else if (result != null) {
-			// handle succesfull download or found in cache
-			if (listener != null) {
-				listener.onResourceUpdate(result);
+			for (DownloadListener listener : listeners) {
+				if (listener != null) {
+					listener.onError(error);
+				}
 			}
 		} else {
-			// no exception, no uri: we don't have connection and no cached res is available
+			// handle succesfull download or found in cache
+			for (DownloadListener listener : listeners) {
+				if (result != null && listener != null) {
+					listener.onResourceUpdate(targetUri);
+				}
+			}
+		}
+		if (pending.containsKey(targetUri)) {
+			pending.remove(targetUri);
 		}
 	}
-	
+
 	private void augmentWithIfModifiedSince(final File targetFile, final AbstractHttpMessage mess) {
 		if (targetFile.exists()) {
 			final String lastModifiedFormatted = DateUtils.formatDate(new Date(targetFile.lastModified()));
@@ -87,22 +98,17 @@ public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtil
 
 	@Override
 	protected Uri doInBackground(final Void... params) {
-		if (!cacheDir.exists()) {
-			cacheDir.mkdirs();
-		}
 		error = null;
 		if (weAreOnline()) {
 			final HttpGet getFile = new HttpGet(targetUri.toString());
-			augmentWithIfModifiedSince(targetFile, getFile);
-			File tempFile = null;
 			try {
-				tempFile = File.createTempFile(TAG, ".tmp", cacheDir);
 				final HttpResponse resp = httpClient.execute(getFile);
+
 				final HttpEntity ent = resp.getEntity();
 				final int statusCode = resp.getStatusLine().getStatusCode();
 				switch (statusCode) {
 				case HttpStatus.SC_OK:
-					handleEntity(ent, targetFile, tempFile);
+					handleEntity(ent);
 					break;
 				case HttpStatus.SC_NOT_MODIFIED:
 					break;
@@ -113,36 +119,24 @@ public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtil
 				if (ent != null) {
 					ent.consumeContent();
 				}
+				return targetUri;
 			} catch (Throwable e) {
 				error = new RuntimeException(TAG + ": error", e);
 				e.printStackTrace();
+				return null;
 			} finally {
-				if (tempFile != null && tempFile.exists()) {
-					tempFile.delete();
-				}
 			}
-		}
-
-		if (targetFile.exists()) {
-			return Uri.parse(targetFile.getAbsolutePath());
 		} else {
 			return null;
 		}
 	}
 
-	private void handleEntity(final HttpEntity ent, final File targetFile, final File tempFile)
-			throws IllegalStateException, IOException {
+	private void handleEntity(final HttpEntity ent) throws IllegalStateException, IOException {
 		clength = ent.getContentLength();
 		InputStream in = ent.getContent();
-		FileOutputStream out = new FileOutputStream(tempFile);
-		FileUtils.copy(in, out, this);
-		out.close();
-
-		// if everything went fine you want to switch temp and target file, guarded
-		if (targetFile.exists()) {
-			targetFile.delete();
+		if (cache != null) {
+			cache.save(targetUri.getLastPathSegment(), in);
 		}
-		FileUtils.copyFile(tempFile, targetFile);
 	}
 
 	private static final String TAG = "DownloadTask";
@@ -165,8 +159,12 @@ public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtil
 		final NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
 		return ni != null && ni.isConnected();
 	}
-	
-	public void setListener(DownloadListener listener) {
-		this.listener = listener;
+
+	public void addListener(DownloadListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(DownloadListener listener) {
+		listeners.remove(listener);
 	}
 }
