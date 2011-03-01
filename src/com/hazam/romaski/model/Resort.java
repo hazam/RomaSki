@@ -17,12 +17,15 @@ public class Resort extends ArrayList<Uri> {
 	
 	static {
 		CAMPO_FELICE.setName("Campo Felice");
+		CAMPO_FELICE.add(Uri.parse("http://www.meteoappennino.it/webcampofelice/01/images/campofelice_pdah.jpg"));
 		CAMPO_FELICE.add(Uri.parse("http://www.meteoappennino.it/webcampofelice/01/images/campofelice_zoom_fpdah.jpg"));
 		CAMPO_FELICE.add(Uri.parse("http://www.meteoappennino.it/webcampofelice/02/images/campofelice02_pdah.jpg"));
 		CAMPO_FELICE.add(Uri.parse("http://www.meteoappennino.it/webcampofelice/03/images/campofelice03_pdah.jpg"));
+		CAMPO_FELICE.add(Uri.parse("http://www.meteoappennino.it/webcampofelice/03/images/campofelice03_zoom_epdah.jpg"));	
 		CAMPO_FELICE.add(Uri.parse("http://www.meteoappennino.it/webcampofelice/04/images/campofelice_pdah.jpg"));
 		CAMPO_FELICE.setDrawableId(R.drawable.felice);
 		OVINDOLI.setName("Ovindoli");			
+		OVINDOLI.add(Uri.parse("http://www.meteoappennino.it/webovindoli/001/images/ovindolimagnola_pda480.jpg"));
 		OVINDOLI.add(Uri.parse("http://www.meteoappennino.it/webovindoli/001/images/ovindolimagnola_zoom_gpdah.jpg"));
 		OVINDOLI.add(Uri.parse("http://www.meteoappennino.it/webovindoli/002/images/ovindolimagnola_pda480.jpg"));
 		OVINDOLI.add(Uri.parse("http://www.meteoappennino.it/webovindoli/002/images/ovindolimagnola_zoom_hpda480.jpg"));
@@ -32,6 +35,7 @@ public class Resort extends ArrayList<Uri> {
 		OVINDOLI.setDrawableId(R.drawable.ovindoli);
 		GRAN_SASSO.setName("Gran Sasso");
 		GRAN_SASSO.add(Uri.parse("http://www.meteoappennino.it/webgransasso/01/images/campoimperatore_pdah.jpg"));
+		GRAN_SASSO.add(Uri.parse("http://www.meteoappennino.it/webgransasso/01/images/campoimperatore_zoom_hpdah.jpg"));
 		GRAN_SASSO.setDrawableId(R.drawable.gran_sasso);
 		ALL.put(CAMPO_FELICE.getId(), CAMPO_FELICE);
 		ALL.put(OVINDOLI.getId(), OVINDOLI);

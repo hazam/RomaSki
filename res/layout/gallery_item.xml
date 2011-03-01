@@ -5,5 +5,5 @@
 	android:layout_height="280dp"
 	android:src="@drawable/ovindolimagnola_pda480"
 	android:adjustViewBounds="false"
-	android:background="@android:color/black"
+	android:background="@android:color/transparent"
 />

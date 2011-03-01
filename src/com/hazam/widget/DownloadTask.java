@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.hazam.handy.fs.FileUtils;
 import com.hazam.handy.fs.FilesystemCache;
+import com.hazam.handy.net.Base64;
 import com.hazam.handy.net.BetterHttpClient;
 
 public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtils.Tick {
@@ -135,7 +136,9 @@ public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtil
 		clength = ent.getContentLength();
 		InputStream in = ent.getContent();
 		if (cache != null) {
-			cache.save(targetUri.getLastPathSegment(), in);
+			String tUr = targetUri.toString();
+			
+			cache.save(Base64.encodeToString(tUr.getBytes(), Base64.DEFAULT), in);
 		}
 	}
 

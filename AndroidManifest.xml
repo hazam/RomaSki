@@ -3,6 +3,7 @@
 	package="com.hazam.romaski" android:versionCode="5"
 	android:versionName="1.2">
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
+		android:name=".RomaSkiApplication"
 		android:theme="@style/Theme.RomaSki">
 		<activity android:name=".RomaTabsActivity" 
 		android:screenOrientation="portrait" android:label="@string/app_name">

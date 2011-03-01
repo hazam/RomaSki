@@ -1,17 +1,16 @@
 package com.hazam.widget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask.Status;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 
+import com.hazam.handy.HandyApplication;
 import com.hazam.handy.fs.ImageCache;
-import com.hazam.handy.graphics.ImageUtils;
+import com.hazam.handy.net.Base64;
 import com.hazam.romaski.R;
 import com.hazam.widget.DownloadTask.DownloadListener;
 
@@ -24,7 +23,7 @@ public class RemoteImageView extends ImageView implements DownloadListener {
 
 	private static final String TAG = "RemoteImageView";
 	private Uri remoteUri = null;
-	private static ImageCache cache;
+	private ImageCache cache;
 	private DownloadTask currentTask = null;
 
 	public RemoteImageView(Context context) {
@@ -43,8 +42,9 @@ public class RemoteImageView extends ImageView implements DownloadListener {
 	}
 
 	private void init(Context ctx) {
+		cache = (ImageCache) HandyApplication.getAppService(HandyApplication.IMAGE_CACHE_APPSERVICE);
 		if (cache == null) {
-			cache = new ImageCache(ctx, TAG);
+			throw new RuntimeException("No ImageCache service registered!");
 		}
 	}
 
@@ -93,10 +93,10 @@ public class RemoteImageView extends ImageView implements DownloadListener {
 	}
 	
 	private void setImageFromCache() {
-
-		if (cache.hasEntryFor(remoteUri.getLastPathSegment())) {
-			trace("Found in cache!" + remoteUri.getLastPathSegment());
-			Bitmap orig = cache.getBitmap(remoteUri.getLastPathSegment());
+		String id = Base64.encodeToString(remoteUri.toString().getBytes(), Base64.DEFAULT);
+		if (cache.hasEntryFor( id )) {
+			trace("Found in cache!" + remoteUri);
+			Bitmap orig = cache.getBitmap(id);
 			setImageBitmap(orig);
 		}
 	}
@@ -105,15 +105,6 @@ public class RemoteImageView extends ImageView implements DownloadListener {
 	public void onResourceUpdate(Uri uri) {
 		trace("RESOURCE IS DOWNLOADED " + uri);
 		setImageFromCache();
-		// better invalidating the parent, it could be a listview recycling views
-		View parent = (View) getParent();
-		//trace("INVALIDATEING" + parent+" "+this);
-		Activity orig = (Activity)getContext();
-		parent = orig.findViewById(R.id.webcams);
-		//trace("NOW" + parent);
-		if (parent != null) {
-			parent.forceLayout();
-		}
 	}
 
 	@Override
