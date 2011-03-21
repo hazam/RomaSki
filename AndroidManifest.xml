@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.hazam.romaski" android:versionCode="5"
-	android:versionName="1.2">
+	package="com.hazam.romaski" android:versionCode="4"
+	android:versionName="1.1">
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
-		android:name=".RomaSkiApplication"
-		android:theme="@style/Theme.RomaSki">
-		<activity android:name=".RomaTabsActivity" 
-		android:screenOrientation="portrait" android:label="@string/app_name">
+		android:name=".RomaSkiApplication">
+		<activity android:name=".RomaTabsActivity" >
+		</activity>
+		<activity android:name="ResortInfoActivity" />
+		<activity android:name="RomaSkiFragmentActivity" android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name="ResortInfoActivity" />
 	</application>
-	<uses-sdk android:minSdkVersion="4" android:targetSdkVersion="7"/>
+	<uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11"/>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest> 

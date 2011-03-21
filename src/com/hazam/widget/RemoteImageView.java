@@ -74,7 +74,7 @@ public class RemoteImageView extends ImageView implements DownloadListener {
 		currentTask = new DownloadTask(getContext(), remoteUri, cache);
 		currentTask.addListener(this);
 		trace("Start download for: " + remoteUri);
-		currentTask.execute();
+		currentTask.executeManaged();
 	}
 
 	public void cacheReload() {

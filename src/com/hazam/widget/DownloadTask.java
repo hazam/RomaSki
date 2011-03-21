@@ -19,7 +19,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
+import com.hazam.os.ManagedAsyncTask;
+
 import android.util.Log;
 
 import com.hazam.handy.fs.FileUtils;
@@ -27,7 +28,7 @@ import com.hazam.handy.fs.FilesystemCache;
 import com.hazam.handy.net.Base64;
 import com.hazam.handy.net.BetterHttpClient;
 
-public class DownloadTask extends AsyncTask<Void, Long, Uri> implements FileUtils.Tick {
+public class DownloadTask extends ManagedAsyncTask<Void, Long, Uri> implements FileUtils.Tick {
 
 	private final Context ctx;
 	private final ConnectivityManager connectivityManager;

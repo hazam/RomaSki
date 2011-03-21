@@ -2,6 +2,7 @@ package com.hazam.romaski;
 
 import com.hazam.handy.HandyApplication;
 import com.hazam.handy.fs.ImageCache;
+import com.hazam.widget.ImageFilter;
 
 public class RomaSkiApplication extends HandyApplication {
 	public static final String TAG = "RomaSki";

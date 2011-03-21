@@ -27,12 +27,16 @@ public final class R {
         public static final int window_bg=0x7f020009;
     }
     public static final class id {
-        public static final int webcams=0x7f070000;
+        public static final int tabs=0x7f070000;
+        public static final int webcams=0x7f070001;
     }
     public static final class layout {
         public static final int gallery_item=0x7f030000;
-        public static final int main=0x7f030001;
-        public static final int window_title=0x7f030002;
+        public static final int handset_main=0x7f030001;
+        public static final int main=0x7f030002;
+        public static final int tablet_main=0x7f030003;
+        public static final int tabs_fragment=0x7f030004;
+        public static final int window_title=0x7f030005;
     }
     public static final class string {
         public static final int app_name=0x7f040000;
