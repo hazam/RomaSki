@@ -2,6 +2,7 @@ package com.hazam.os;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -21,9 +22,10 @@ public abstract class ManagedAsyncTask<Params, Progress, Result> extends AsyncTa
 			return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
 		}
 	};
-
-	private static final ThreadPoolExecutor mExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, sWorkQueue,
+	private static Executor defaultExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, sWorkQueue,
 			sThreadFactory);
+
+	private Executor mExecutor = null;
 
 	private final ReflectionAccessor accessor;
 
@@ -32,6 +34,14 @@ public abstract class ManagedAsyncTask<Params, Progress, Result> extends AsyncTa
 		accessor = new ReflectionAccessor(this);
 	}
 
+	public void setExecutor(Executor ex) {
+		mExecutor = ex;
+	}
+
+	public static void setDefaultExecutor(Executor ex) {
+		defaultExecutor = ex;
+	}
+	
 	private static class ReflectionAccessor {
 		private static Field statusField;
 		private static Field workerField;
@@ -103,6 +113,12 @@ public abstract class ManagedAsyncTask<Params, Progress, Result> extends AsyncTa
 	}
 
 	public AsyncTask<Params, Progress, Result> executeManaged(Params... params) {
+		if (mExecutor == null) {
+			mExecutor = defaultExecutor;
+		}
+		if (mExecutor == null) {
+			throw new RuntimeException("Executor or DefaultExecutor have to be specified!");
+		}
 		final Status thisStatus = getStatus();
 
 		if (thisStatus != Status.PENDING) {
