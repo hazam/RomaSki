@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<fragment android:name="com.hazam.romaski.TabsFragment"
+		android:id="@+id/tabs" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<LinearLayout android:orientation="horizontal"
+		android:layout_weight="1" android:background="@drawable/window_bg"
+		android:layout_width="fill_parent" android:gravity="left"
+		android:layout_height="0dp">
+		<fragment android:name="com.hazam.romaski.WebcamsFragment"
+			android:id="@+id/webcams"
+			android:layout_weight="0"
+            android:layout_width="280dp"
+			android:layout_height="fill_parent" />
+		<fragment android:name="com.hazam.romaski.PinchableImageFragment"
+			android:id="@+id/detail"
+			android:layout_weight="1"
+            android:layout_width="0px"
+			android:layout_height="fill_parent" />
+	</LinearLayout>
+</LinearLayout>

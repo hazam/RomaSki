@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<fragment android:name="com.hazam.romaski.TabsFragment"
+		android:id="@+id/tabs" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<FrameLayout android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:background="@drawable/window_bg">
+		<fragment android:name="com.hazam.romaski.WebcamsFragment"
+			android:background="@drawable/window_bg" android:id="@+id/webcams"
+			android:layout_width="fill_parent" android:layout_height="fill_parent" />
+	</FrameLayout>
+</LinearLayout>

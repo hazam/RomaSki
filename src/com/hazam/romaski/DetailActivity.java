@@ -1,20 +1,20 @@
 package com.hazam.romaski;
 
-import com.hazam.widget.Pinch;
-import com.hazam.widget.PinchListener;
-
-import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
-public class DetailActivity extends Activity {
+public class DetailActivity extends FragmentActivity {
+	public static final String EXTRA_URI = "extra_uri";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detail);
-		ImageView piw = (ImageView) findViewById(R.id.detail);
-		piw.setImageResource(R.drawable.ovindolimagnola_pda480);
-		Pinch.makePinchable(piw);
+		FragmentManager fm = getSupportFragmentManager();
+		PinchableImageFragment detailFrag = (PinchableImageFragment) fm.findFragmentById(R.id.detail);
+		Uri target = Uri.parse(getIntent().getStringExtra(EXTRA_URI));
+		detailFrag.setTarget(target);
 	}
 }

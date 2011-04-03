@@ -28,24 +28,25 @@ public final class R {
     }
     public static final class id {
         public static final int detail=0x7f070000;
+        public static final int img=0x7f070003;
         public static final int tabs=0x7f070001;
         public static final int webcams=0x7f070002;
     }
     public static final class layout {
-        public static final int detail=0x7f030000;
-        public static final int gallery_item=0x7f030001;
-        public static final int handset_main=0x7f030002;
+        public static final int adapter_item=0x7f030000;
+        public static final int detail=0x7f030001;
+        public static final int home=0x7f030002;
         public static final int main=0x7f030003;
-        public static final int tablet_main=0x7f030004;
+        public static final int pinchable_fragment=0x7f030004;
         public static final int tabs_fragment=0x7f030005;
-        public static final int window_title=0x7f030006;
+        public static final int webcams_list=0x7f030006;
+        public static final int window_title=0x7f030007;
     }
     public static final class string {
         public static final int app_name=0x7f040000;
-        public static final int hello=0x7f040001;
     }
     public static final class style {
         public static final int CustomWindowTitleBackground=0x7f060000;
-        public static final int Theme_RomaSki=0x7f060001;
+        public static final int RomaSki=0x7f060001;
     }
 }

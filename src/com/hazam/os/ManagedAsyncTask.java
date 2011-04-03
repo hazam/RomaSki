@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import android.os.AsyncTask;
 
 public abstract class ManagedAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
-	private static final BlockingQueue<Runnable> sWorkQueue = new LinkedBlockingQueue<Runnable>(10);
+	private static final FixedSizeLIFOQueue sWorkQueue = new FixedSizeLIFOQueue(10);
 
 	private static final ThreadFactory sThreadFactory = new ThreadFactory() {
 		private final AtomicInteger mCount = new AtomicInteger(1);
@@ -22,8 +21,39 @@ public abstract class ManagedAsyncTask<Params, Progress, Result> extends AsyncTa
 			return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
 		}
 	};
-	private static Executor defaultExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, sWorkQueue,
-			sThreadFactory);
+	
+
+	static class SingleThreadExecutor extends ThreadPoolExecutor {
+	  
+	  public SingleThreadExecutor(BlockingQueue<Runnable> queue) {
+	    // Timeout doesn't really matter
+	    super(1, 1, 50, TimeUnit.SECONDS, queue);
+	  }
+	}
+
+	static class FixedSizeLIFOQueue extends com.hazam.handy.util.LinkedBlockingDeque<Runnable> {
+	  
+	  private static final long serialVersionUID = -220022960932112863L;
+	  
+	  public FixedSizeLIFOQueue(int max) {
+	    super(max);
+	  }
+	  
+	  @Override
+	  public synchronized boolean offer(Runnable e) {
+	    lock.lock();
+	    if (size() == capacity) {
+	      try {
+	        removeLast();
+	      } catch (Exception ex) { /* don't think we can do anything */
+	      }
+	    }
+	    boolean toret = super.offerFirst(e);
+	    lock.unlock();
+	    return toret;
+	  }
+	}
+	private static Executor defaultExecutor = new SingleThreadExecutor(sWorkQueue);
 
 	private Executor mExecutor = null;
 

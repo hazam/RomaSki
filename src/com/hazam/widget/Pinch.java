@@ -2,9 +2,12 @@ package com.hazam.widget;
 
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
@@ -12,14 +15,46 @@ import com.hazam.handy.graphics.GraphicUtils;
 import com.hazam.handy.util.L;
 
 public class Pinch {
-
-	public static void makePinchable(ImageView iv) {
+	private static L log = new L("Pinch", Log.DEBUG);
+	public static void makePinchable(final ImageView iv) {
 		iv.setClickable(true);
 		iv.setScaleType(ScaleType.MATRIX);
-		PinchListener list = new PinchListener();
+		final PinchListener list = new PinchListener();
+		iv.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			
+			public void onGlobalLayout() {
+				float imvH = iv.getMeasuredHeight();
+				float imvW = iv.getMeasuredWidth();
+				Drawable bitmap = iv.getDrawable();
+				float bmpH = bitmap.getIntrinsicHeight();
+				float bmpW = bitmap.getIntrinsicWidth();
+				
+				float heightRatio = imvH / bmpH;
+				float widthRatio = imvW / bmpW;
+				float ratioClosestToOne;
+				if (heightRatio < widthRatio) {
+					ratioClosestToOne = heightRatio;
+				} else {
+					ratioClosestToOne = widthRatio;
+				}
+				list.matrix.setScale(ratioClosestToOne, ratioClosestToOne);
+				float newHeight = ratioClosestToOne * bmpH;
+				float newWidth = ratioClosestToOne * bmpW;
+				list.matrix.postTranslate((imvW - newWidth) / 2, (imvH - newHeight) / 2);
+				iv.setImageMatrix(list.matrix);
+				log.d("ImageView: "+iv.getMeasuredWidth()+", "+iv.getMeasuredHeight());
+				log.d("Bitmap: "+iv.getDrawable().getIntrinsicWidth()+", "+iv.getDrawable().getIntrinsicHeight());
+				iv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+			}
+		});
+		//list.matrix.setScale(2.0f, 2.0f);
+		//list.matrix.preTranslate(90.0f, 0.0f);
 		iv.setImageMatrix(list.matrix);
+		
 		iv.setOnTouchListener(list);
 	}
+	
+	
 
 	private static class PinchListener implements OnTouchListener {
 		private ImageView target;
@@ -27,7 +62,7 @@ public class Pinch {
 		{
 			matrix.setTranslate(1f, 1f);
 		}
-		Matrix savedMatrix = new Matrix();
+		private Matrix savedMatrix = new Matrix();
 
 		// We can be in one of these 3 states
 		private static final int NONE = 0;
@@ -87,7 +122,6 @@ public class Pinch {
 				}
 				break;
 			}
-
 			target.setImageMatrix(matrix);
 			return true;
 		}

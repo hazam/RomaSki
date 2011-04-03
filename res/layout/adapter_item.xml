@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--ImageView android:adjustViewBounds/-->
+<com.hazam.widget.RemoteImageView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="280dp"
+	android:layout_height="280dp"
+	android:src="@drawable/ovindolimagnola_pda480"
+	android:adjustViewBounds="false"
+	android:background="@android:color/transparent"
+/>

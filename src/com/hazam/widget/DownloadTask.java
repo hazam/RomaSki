@@ -19,14 +19,13 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import com.hazam.os.ManagedAsyncTask;
-
 import android.util.Log;
 
 import com.hazam.handy.fs.FileUtils;
 import com.hazam.handy.fs.FilesystemCache;
 import com.hazam.handy.net.Base64;
 import com.hazam.handy.net.BetterHttpClient;
+import com.hazam.os.ManagedAsyncTask;
 
 public class DownloadTask extends ManagedAsyncTask<Void, Long, Uri> implements FileUtils.Tick {
 

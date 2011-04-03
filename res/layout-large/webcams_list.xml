@@ -3,7 +3,6 @@
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:gravity="center" android:background="@drawable/window_bg"
 	android:layout_height="fill_parent">
-	<fragment android:name="com.hazam.romaski.PinchableImageFragment"
-		android:id="@+id/detail" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" />
+	<ListView android:id="@+id/webcams"
+		android:layout_width="fill_parent" android:layout_height="wrap_content" />
 </LinearLayout>

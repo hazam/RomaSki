@@ -30,7 +30,7 @@ public class WebcamImagesAdapter extends BaseAdapter {
 		System.out.println("Getting View for uri "+targetUri+", pos: "+position+", convert "+convertView);
 		RemoteImageView toret = null;
 		if (convertView == null) {
-			toret = (RemoteImageView) inflater.inflate(R.layout.gallery_item, parent, false);
+			toret = (RemoteImageView) inflater.inflate(R.layout.adapter_item, parent, false);
 		} else {
 			toret = (RemoteImageView) convertView;
 		}
