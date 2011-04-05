@@ -26,6 +26,7 @@ import com.hazam.handy.fs.FilesystemCache;
 import com.hazam.handy.net.Base64;
 import com.hazam.handy.net.BetterHttpClient;
 import com.hazam.os.ManagedAsyncTask;
+import com.hazam.romaski.BoundedLIFOExecutor;
 
 public class DownloadTask extends ManagedAsyncTask<Void, Long, Uri> implements FileUtils.Tick {
 
@@ -54,6 +55,7 @@ public class DownloadTask extends ManagedAsyncTask<Void, Long, Uri> implements F
 		this.connectivityManager = (ConnectivityManager) ctx.getSystemService(Activity.CONNECTIVITY_SERVICE);
 		this.targetUri = targetUri;
 		this.cache = cache;
+		this.setExecutor(BoundedLIFOExecutor.i());
 	}
 
 	public static interface DownloadListener {

@@ -1,59 +1,15 @@
 package com.hazam.os;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import android.os.AsyncTask;
 
 public abstract class ManagedAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
-	private static final FixedSizeLIFOQueue sWorkQueue = new FixedSizeLIFOQueue(10);
-
-	private static final ThreadFactory sThreadFactory = new ThreadFactory() {
-		private final AtomicInteger mCount = new AtomicInteger(1);
-
-		public Thread newThread(Runnable r) {
-			return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
-		}
-	};
 	
-
-	static class SingleThreadExecutor extends ThreadPoolExecutor {
-	  
-	  public SingleThreadExecutor(BlockingQueue<Runnable> queue) {
-	    // Timeout doesn't really matter
-	    super(1, 1, 50, TimeUnit.SECONDS, queue);
-	  }
-	}
-
-	static class FixedSizeLIFOQueue extends com.hazam.handy.util.LinkedBlockingDeque<Runnable> {
-	  
-	  private static final long serialVersionUID = -220022960932112863L;
-	  
-	  public FixedSizeLIFOQueue(int max) {
-	    super(max);
-	  }
-	  
-	  @Override
-	  public synchronized boolean offer(Runnable e) {
-	    lock.lock();
-	    if (size() == capacity) {
-	      try {
-	        removeLast();
-	      } catch (Exception ex) { /* don't think we can do anything */
-	      }
-	    }
-	    boolean toret = super.offerFirst(e);
-	    lock.unlock();
-	    return toret;
-	  }
-	}
-	private static Executor defaultExecutor = new SingleThreadExecutor(sWorkQueue);
+	private static Executor defaultExecutor = Executors.newSingleThreadExecutor();
 
 	private Executor mExecutor = null;
 
