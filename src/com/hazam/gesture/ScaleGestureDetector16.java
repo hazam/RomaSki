@@ -5,28 +5,17 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-public class ScaleGestureDetector16 extends SimpleOnGestureListener {
-
-	public interface OnScaleGestureListener {
-
-		public boolean onScale(ScaleGestureDetector16 detector);
-
-		public boolean onScaleBegin(ScaleGestureDetector16 detector);
-
-		public void onScaleEnd(ScaleGestureDetector16 detector);
-	}
+class ScaleGestureDetector16 extends ScaleGestureDetector {
 
 	private static final String TAG = "ScaleGesture16";
 
 	private static final float MAX_SCALE_LEVELS = 5.0f;
 
-	private OnScaleGestureListener mListener;
 	private boolean mGestureInProgress;
 	private float mFocusY;
 	private float mFocusX;
@@ -38,27 +27,22 @@ public class ScaleGestureDetector16 extends SimpleOnGestureListener {
 
 	private float mStepFor1xScale;
 
-	public ScaleGestureDetector16(Context context,
-			OnScaleGestureListener listener) {
-		mListener = listener;
-		mGestureDetector = new GestureDetector(context, this);
+	public ScaleGestureDetector16(Context context) {
+		super();
+		mGestureDetector = new GestureDetector(context, new InternalListener());
 		mGestureDetector.setIsLongpressEnabled(true);
 		final Context ctx = context;
-		if (ctx.getPackageManager().checkPermission(permission.VIBRATE,
-				ctx.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-			mVibrator = (Vibrator) ctx
-					.getSystemService(Context.VIBRATOR_SERVICE);
+		if (ctx.getPackageManager().checkPermission(permission.VIBRATE, ctx.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+			mVibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
 		} else {
-			Log.w(TAG, "add permission " + permission.VIBRATE
-					+ " for haptic feedback!");
+			Log.w(TAG, "add permission " + permission.VIBRATE + " for haptic feedback!");
 		}
 
 		calibrateScaleSpace(ctx);
 	}
 
 	private void calibrateScaleSpace(Context ctx) {
-		final WindowManager wm = (WindowManager) ctx
-				.getSystemService(Context.WINDOW_SERVICE);
+		final WindowManager wm = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
 		final int displayHeight = wm.getDefaultDisplay().getHeight();
 		mStepFor1xScale = displayHeight / MAX_SCALE_LEVELS;
 	}
@@ -92,7 +76,7 @@ public class ScaleGestureDetector16 extends SimpleOnGestureListener {
 			if (currentSpan > 0.0f) {
 				mScaleFactor = 1.0f + currentSpan / mStepFor1xScale;
 			} else {
-				mScaleFactor = 1.0f / ( 1 - currentSpan / mStepFor1xScale);
+				mScaleFactor = 1.0f / (1 - currentSpan / mStepFor1xScale);
 			}
 		}
 		return mScaleFactor;
@@ -114,39 +98,41 @@ public class ScaleGestureDetector16 extends SimpleOnGestureListener {
 
 	public boolean onTouchEvent(MotionEvent event) {
 		final int action = event.getAction();
-		mLastEvent = MotionEvent.obtain(event);
 		System.out.println("dd " + action);
+		boolean consumed = false;
 		if (!mGestureInProgress) {
 			mGestureDetector.onTouchEvent(event);
-			return false;
+			consumed = false;
 		} else { // mGestureInProgress
-			if (action == MotionEvent.ACTION_UP) {
+			if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
 				mGestureInProgress = false;
-				if (mListener != null) {
-					resetCached();
-					mListener.onScaleEnd(this);
-				}
-				return true;
-			} else if (action == MotionEvent.ACTION_MOVE) {
-				// update the blip
-				mCurrFingerDiffY = event.getY() - mFocusY;
 				resetCached();
-				return mListener != null && mListener.onScale(this);
-
+				notifyScaleEnd();
+				consumed = true;
+			} else if (action == MotionEvent.ACTION_MOVE) {
+				float startY = mLastEvent != null ? mLastEvent.getY() : mFocusY;
+				// update the blip
+				float delta = event.getY() - startY;
+				mCurrFingerDiffY = delta;
+				resetCached();
+				consumed = notifyScale();
+				Log.d("Pinch", "mCurrFinderDiffY " + mCurrFingerDiffY);
 			}
 		}
-		return false;
+		mLastEvent = MotionEvent.obtain(event);
+		return consumed;
 	}
 
-	@Override
-	public void onLongPress(MotionEvent e) {
-		if (!mGestureInProgress) {
-			if (mListener != null) {
+	private class InternalListener extends SimpleOnGestureListener {
+		@Override
+		public void onLongPress(MotionEvent e) {
+			if (!mGestureInProgress) {
 				resetCached();
 				mFocusX = e.getX();
 				mFocusY = e.getY();
 				mCurrFingerDiffY = 0;
-				boolean started = mListener.onScaleBegin(this);
+				mLastEvent = null;
+				boolean started = notifyScaleBegin();
 				if (started) {
 					mGestureInProgress = true;
 					if (mVibrator != null) {
