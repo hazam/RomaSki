@@ -16,5 +16,8 @@ public class DetailActivity extends FragmentActivity {
 		PinchableImageFragment detailFrag = (PinchableImageFragment) fm.findFragmentById(R.id.detail);
 		Uri target = Uri.parse(getIntent().getStringExtra(EXTRA_URI));
 		detailFrag.setTarget(target);
+		
+		
+		
 	}
 }
