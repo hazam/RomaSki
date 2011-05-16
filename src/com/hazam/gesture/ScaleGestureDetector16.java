@@ -26,9 +26,9 @@ class ScaleGestureDetector16 extends ScaleGestureDetector {
 	private Vibrator mVibrator;
 
 	private float mStepFor1xScale;
-
-	public ScaleGestureDetector16(Context context) {
-		super();
+	private ScaleGestureDetector mDelegate;
+	public ScaleGestureDetector16(Context context, ScaleGestureDetector del) {
+		mDelegate = del;
 		mGestureDetector = new GestureDetector(context, new InternalListener());
 		mGestureDetector.setIsLongpressEnabled(true);
 		final Context ctx = context;
@@ -107,7 +107,7 @@ class ScaleGestureDetector16 extends ScaleGestureDetector {
 			if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
 				mGestureInProgress = false;
 				resetCached();
-				notifyScaleEnd();
+				mDelegate.notifyScaleEnd();
 				consumed = true;
 			} else if (action == MotionEvent.ACTION_MOVE) {
 				float startY = mLastEvent != null ? mLastEvent.getY() : mFocusY;
@@ -115,7 +115,7 @@ class ScaleGestureDetector16 extends ScaleGestureDetector {
 				float delta = event.getY() - startY;
 				mCurrFingerDiffY = delta;
 				resetCached();
-				consumed = notifyScale();
+				consumed = mDelegate.notifyScale();
 				Log.d("Pinch", "mCurrFinderDiffY " + mCurrFingerDiffY);
 			}
 		}
@@ -126,13 +126,15 @@ class ScaleGestureDetector16 extends ScaleGestureDetector {
 	private class InternalListener extends SimpleOnGestureListener {
 		@Override
 		public void onLongPress(MotionEvent e) {
+			
 			if (!mGestureInProgress) {
 				resetCached();
 				mFocusX = e.getX();
 				mFocusY = e.getY();
 				mCurrFingerDiffY = 0;
 				mLastEvent = null;
-				boolean started = notifyScaleBegin();
+				boolean started = mDelegate.notifyScaleBegin();
+				System.out.println("notifyScaleBegin "+mGestureInProgress);
 				if (started) {
 					mGestureInProgress = true;
 					if (mVibrator != null) {
@@ -140,6 +142,7 @@ class ScaleGestureDetector16 extends ScaleGestureDetector {
 					}
 				}
 			}
+			System.out.println("LongoPRess "+mGestureInProgress);
 		}
 	}
 }

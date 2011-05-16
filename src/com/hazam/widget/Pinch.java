@@ -97,6 +97,7 @@ public class Pinch {
 
 		@Override
 		public boolean onScaleBegin(ScaleGestureDetector detector) {
+			System.out.println("onScaleBegin");
 			return true;
 		}
 

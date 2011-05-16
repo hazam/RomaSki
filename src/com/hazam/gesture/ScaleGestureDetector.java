@@ -60,24 +60,26 @@ public class ScaleGestureDetector {
 
 	private ScaleGestureDetector internalDelegate;
 	private Canary nativeDelegate;
-	
+
 	public ScaleGestureDetector(Context ctx, OnScaleGestureListener listener) {
 		mListener = listener;
 		int buildInt = android.os.Build.VERSION.SDK_INT;
 		if (buildInt == android.os.Build.VERSION_CODES.DONUT) {
-			internalDelegate = new ScaleGestureDetector16(ctx);
+			internalDelegate = new ScaleGestureDetector16(ctx, this);
 		} else if (buildInt == android.os.Build.VERSION_CODES.ECLAIR) {
-			internalDelegate = new ScaleGestureDetector21(ctx);
+			internalDelegate = new ScaleGestureDetector21(ctx, this);
 		} else if (buildInt >= android.os.Build.VERSION_CODES.FROYO) {
 			try {
 				Canary.tryNewClass();
 				initalizeNative(ctx);
-			} catch (VerifyError th) {th.printStackTrace();}
+			} catch (VerifyError th) {
+				th.printStackTrace();
+			}
 		} else {
-			throw new RuntimeException("Version not supported! "+ buildInt); 
+			throw new RuntimeException("Version not supported! " + buildInt);
 		}
 	}
-	
+
 	private void initalizeNative(Context ctx) {
 		nativeDelegate = new Canary(ctx, this, mListener);
 	}
@@ -97,36 +99,37 @@ public class ScaleGestureDetector {
 
 	protected boolean notifyScale() {
 		if (mListener != null) {
+			System.out.println("notifyScale");
 			return mListener.onScale(this);
 		}
 		return false;
 	}
-	
+
 	public float getFocusX() {
 		float toret = internalDelegate != null ? internalDelegate.getFocusX() : nativeDelegate.getFocusX();
 		return toret;
 	}
-	
+
 	public float getFocusY() {
 		float toret = internalDelegate != null ? internalDelegate.getFocusY() : nativeDelegate.getFocusY();
 		return toret;
 	}
-	
+
 	public boolean isInProgress() {
 		boolean toret = internalDelegate != null ? internalDelegate.isInProgress() : nativeDelegate.isInProgress();
 		return toret;
 	}
-	
+
 	public float getCurrentSpan() {
 		float toret = internalDelegate != null ? internalDelegate.getCurrentSpan() : nativeDelegate.getCurrentSpan();
 		return toret;
 	}
-	
+
 	public float getPreviousSpan() {
 		float toret = internalDelegate != null ? internalDelegate.getPreviousSpan() : nativeDelegate.getPreviousSpan();
 		return toret;
 	}
-	
+
 	public float getScaleFactor() {
 		float toret = internalDelegate != null ? internalDelegate.getScaleFactor() : nativeDelegate.getScaleFactor();
 		return toret;
@@ -135,16 +138,17 @@ public class ScaleGestureDetector {
 	public long getEventTime() {
 		long toret = internalDelegate != null ? internalDelegate.getEventTime() : nativeDelegate.getEventTime();
 		return toret;
-		
+
 	}
+
 	public long getTimeDelta() {
 		long toret = internalDelegate != null ? internalDelegate.getTimeDelta() : nativeDelegate.getTimeDelta();
 		return toret;
 	}
-	
 
 	public boolean onTouchEvent(MotionEvent event) {
-		boolean toret = internalDelegate != null ? internalDelegate.onTouchEvent(event) : nativeDelegate.onTouchEvent(event);
+		boolean toret = internalDelegate != null ? internalDelegate.onTouchEvent(event) : nativeDelegate
+				.onTouchEvent(event);
 		return toret;
 	}
 }
