@@ -70,10 +70,11 @@ public class ScaleGestureDetector {
 			internalDelegate = new ScaleGestureDetector21(ctx, this);
 		} else if (buildInt >= android.os.Build.VERSION_CODES.FROYO) {
 			try {
-				Canary.tryNewClass();
+				Canary.tryNewClass(ctx);
 				initalizeNative(ctx);
-			} catch (VerifyError th) {
+			} catch (Throwable th) {
 				th.printStackTrace();
+				internalDelegate = new ScaleGestureDetector21(ctx, this);
 			}
 		} else {
 			throw new RuntimeException("Version not supported! " + buildInt);
