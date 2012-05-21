@@ -1,8 +1,8 @@
 package com.hazam.romaski;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +41,7 @@ public class TabsFragment extends Fragment implements TabContentFactory, OnTabCh
 	@Override
 	public void onTabChanged(String tag) {
 		WebcamImagesAdapter adapter = new WebcamImagesAdapter(getActivity(), tag);
-		FragmentManager fm = getActivity().getSupportFragmentManager();
+		FragmentManager fm = getActivity().getFragmentManager();
 		WebcamsFragment wf = (WebcamsFragment) fm.findFragmentById(R.id.webcams);
 		wf.setAdapter(adapter);
 	}

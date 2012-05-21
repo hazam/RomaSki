@@ -4,10 +4,10 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 import android.view.Window;
 
-public class RomaSkiFragmentActivity extends FragmentActivity {
+public class RomaSkiFragmentActivity extends Activity {
 	private final boolean isHoneycomb = android.os.Build.VERSION.SDK_INT > 10;
 
 	@Override
